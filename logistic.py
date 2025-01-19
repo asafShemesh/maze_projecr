@@ -68,8 +68,8 @@ def recognize_and_print_numbers(cells, model):
         print(grid[i * 9:(i + 1) * 9])
 
 
-sudoku_images_folder = "C:/Users/asaf0/OneDrive/maze_projecr/dataset"
-dat_folder = "C:/Users/asaf0/OneDrive/maze_projecr/labels"
+sudoku_images_folder = "C:/Users/asaf0/OneDrive/sudoku_deepLearning/dataset"
+dat_folder = "C:/Users/asaf0/OneDrive/sudoku_deepLearning/labels"
 
 # Load Sudoku labels
 sudoku_labels = load_sudoku_dat_files(dat_folder)

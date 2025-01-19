@@ -40,7 +40,7 @@ def recognize_and_print_numbers_random(cells):
         print(grid[i * 9:(i + 1) * 9])
 
 # Paths
-sudoku_images_folder = "C:/Users/asaf0/OneDrive/maze_projecr/dataset" 
+sudoku_images_folder = "C:/Users/asaf0/OneDrive/sudoku_deepLearning/dataset" 
 
 # Extract the cells from the first image for demonstration purposes
 image_files = [

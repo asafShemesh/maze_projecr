@@ -82,8 +82,8 @@ def load_sudoku_dat_files(dat_folder):
     return sudoku_data
 
 # Paths 
-sudoku_images_folder = "C:/Users/asaf0/OneDrive/maze_projecr/dataset"
-dat_folder = "C:/Users/asaf0/OneDrive/maze_projecr/labels"
+sudoku_images_folder = "C:/Users/asaf0/OneDrive/sudoku_deepLearning/dataset"
+dat_folder = "C:/Users/asaf0/OneDrive/sudoku_deepLearning/labels"
 
 # Load the Sudoku grids (target output)
 sudoku_labels = load_sudoku_dat_files(dat_folder)
