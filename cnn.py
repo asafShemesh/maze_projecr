@@ -10,19 +10,21 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import precision_score, recall_score
 
 
-# Define the Advanced CNN Model
-class AdvancedCNN(nn.Module):
+# CNN Model
+class CNN(nn.Module):
     def __init__(self):
-        super(AdvancedCNN, self).__init__()
+        super(CNN, self).__init__()
         # Convolutional layers with Batch Normalization
         self.conv1 = nn.Conv2d(1, 32, kernel_size=3, stride=1, padding=1)
         self.bn1 = nn.BatchNorm2d(32)
+
         self.conv2 = nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1)
         self.bn2 = nn.BatchNorm2d(64)
         self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
         
         self.conv3 = nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1)
         self.bn3 = nn.BatchNorm2d(128)
+
         self.conv4 = nn.Conv2d(128, 256, kernel_size=3, stride=1, padding=1)
         self.bn4 = nn.BatchNorm2d(256)
 
@@ -34,7 +36,7 @@ class AdvancedCNN(nn.Module):
         self.dropout1 = nn.Dropout(0.5)
         self.fc2 = nn.Linear(512, 128)
         self.dropout2 = nn.Dropout(0.5)
-        self.fc3 = nn.Linear(128, 10)  # Output 10 classes for digit recognition
+        self.fc3 = nn.Linear(128, 10)
 
     def forward(self, x):
         # Convolutional layers
@@ -58,7 +60,6 @@ class AdvancedCNN(nn.Module):
         x = self.dropout2(x)
         x = self.fc3(x)
         return x
-
 
 def preprocess_and_extract_cells(image_path):
     """Preprocess the Sudoku image, extract the grid, and split it into cells."""
@@ -149,7 +150,7 @@ for image_path, label in zip(image_files, sudoku_labels):
     image_cells.extend(cells)
     image_labels.extend(label)
 
-# Split the data into 80% train and 20% test
+# Split the data
 X_train, X_test, y_train, y_test = train_test_split(image_cells, image_labels, test_size=0.2, random_state=42)
 
 # Create PyTorch Datasets and DataLoaders
@@ -160,7 +161,7 @@ train_loader = torch.utils.data.DataLoader(train_data, batch_size=32, shuffle=Tr
 test_loader = torch.utils.data.DataLoader(test_data, batch_size=32, shuffle=False)
 
 # Initialize the CNN model
-model = AdvancedCNN()
+model = CNN()
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.AdamW(model.parameters(), lr=0.001, weight_decay=1e-4)
 
@@ -168,7 +169,7 @@ optimizer = optim.AdamW(model.parameters(), lr=0.001, weight_decay=1e-4)
 scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.1)
 
 # Training loop with accuracy, precision, and recall
-num_epochs = 3
+num_epochs = 5
 for epoch in range(num_epochs):
     model.train()
     running_loss = 0.0
@@ -224,7 +225,7 @@ print(f"Test Accuracy: {accuracy:.2f}%, Precision: {precision:.2f}, Recall: {rec
 # Save the trained model
 torch.save(model.state_dict(), "sudoku_advanced_cnn_model.pth")
 
-# Example: Recognize and print numbers from a random test image
+# Recognize and print numbers from a random test image
 import random
 if len(image_files) > 0:
     random_index = random.randint(0, len(image_files) - 1)
@@ -243,7 +244,7 @@ if len(image_files) > 0:
     plt.axis('off')
     plt.show()
 
-    # Show the extracted cells arranged in a 9x9 grid
+    # Show the extracted cells
     plt.figure(figsize=(10, 10))
     for i in range(9):
         for j in range(9):
@@ -252,11 +253,6 @@ if len(image_files) > 0:
             plt.axis("off")
     plt.suptitle("Extracted Cells")
     plt.show()
-
-
-
-
-
 
 def is_valid(board, row, col, num):
     """Check if placing num at board[row][col] is valid."""
@@ -272,14 +268,14 @@ def solve_sudoku(board):
     """Solve the Sudoku using backtracking."""
     for row in range(9):
         for col in range(9):
-            if board[row][col] == 0:  # Empty cell
-                for num in range(1, 10):  # Try digits 1-9
+            if board[row][col] == 0:
+                for num in range(1, 10): 
                     if is_valid(board, row, col, num):
                         board[row][col] = num
                         if solve_sudoku(board):
                             return True
-                        board[row][col] = 0  # Undo move
-                return False  # No valid number found
+                        board[row][col] = 0
+                return False
     return True
 
 

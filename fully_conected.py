@@ -8,23 +8,20 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import precision_score, recall_score
 
 
-# Define the neural network structure (should match the one used during training)
+# neural network structure
 class SimpleNN(nn.Module):
     def __init__(self):
         super(SimpleNN, self).__init__()
-        self.fc1 = nn.Linear(28 * 28, 128)  # Compatible with 28x28
+        self.fc1 = nn.Linear(28 * 28, 128)
         self.fc2 = nn.Linear(128, 64)
         self.fc3 = nn.Linear(64, 10)
 
     def forward(self, x):
-        x = x.view(-1, 28 * 28)  # Flatten the input
+        x = x.view(-1, 28 * 28)
         x = torch.relu(self.fc1(x))
         x = torch.relu(self.fc2(x))
         x = self.fc3(x)
         return x
-
-
-
 
 def preprocess_and_extract_cells(image_path):
     """Preprocess the Sudoku image, extract the grid, and split it into cells."""
@@ -40,31 +37,17 @@ def preprocess_and_extract_cells(image_path):
     largest_contour = max(contours, key=cv2.contourArea)
     x, y, w, h = cv2.boundingRect(largest_contour)
     grid = binary[y:y + h, x:x + w]
-
-    # Resize the grid to a standard size (450x450)
     grid = cv2.resize(grid, (450, 450))
-
-    # Split the grid into 9x9 cells, resizing each to 28x28
     cells = []
-    cell_size = 50  # Original size of each cell in the 450x450 grid
+    cell_size = 50 
     for i in range(9):
         for j in range(9):
             cell = grid[i * cell_size:(i + 1) * cell_size, j * cell_size:(j + 1) * cell_size]
-            cell = cv2.resize(cell, (28, 28))  # Resize to 28x28 for digit recognition
-
-            # Normalize and convert to tensor
+            cell = cv2.resize(cell, (28, 28))
             cell = torch.tensor(cell, dtype=torch.float32).unsqueeze(0) / 255.0
             cells.append(cell)
 
     return cells
-
-
-            # Show the cell
-            #plt.imshow(cell.squeeze(0), cmap='gray')
-            #plt.title(f"Cell {i*9 + j + 1}")
-            #plt.axis('off')
-
-
 
 def recognize_and_print_numbers(cells, model):
     """Recognize numbers from extracted Sudoku cells using the trained model, and print the grid."""
@@ -76,7 +59,7 @@ def recognize_and_print_numbers(cells, model):
             predicted_digit = predicted.item()
 
             # If the model does not confidently predict a digit (i.e., predicted digit is 0), treat as empty
-            if predicted_digit == 0:  # You can modify this condition if needed
+            if predicted_digit == 0:
                 grid.append(0)
             else:
                 grid.append(predicted_digit)
@@ -98,10 +81,9 @@ def load_sudoku_dat_files(dat_folder):
             sudoku_data.append(grid)
     return sudoku_data
 
-
-# Paths to the dataset
-sudoku_images_folder = "C:/Users/asaf0/OneDrive/maze_projecr/dataset"  # Path to Sudoku images
-dat_folder = "C:/Users/asaf0/OneDrive/maze_projecr/labels" #path to the dat files
+# Paths 
+sudoku_images_folder = "C:/Users/asaf0/OneDrive/maze_projecr/dataset"
+dat_folder = "C:/Users/asaf0/OneDrive/maze_projecr/labels"
 
 # Load the Sudoku grids (target output)
 sudoku_labels = load_sudoku_dat_files(dat_folder)
@@ -122,7 +104,7 @@ for image_path, label in zip(image_files, sudoku_labels):
     image_cells.extend(cells)   
     image_labels.extend(label)
 
-# Split the data into 80% train and 20% test
+# Split the data
 X_train, X_test, y_train, y_test = train_test_split(image_cells, image_labels, test_size=0.2, random_state=42)
 
 # Create PyTorch Datasets and DataLoaders
@@ -137,9 +119,8 @@ model = SimpleNN()
 criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
-
 # Training loop with accuracy, precision, and recall
-num_epochs = 2
+num_epochs = 5
 for epoch in range(num_epochs):
     model.train()
     running_loss = 0.0
@@ -159,7 +140,7 @@ for epoch in range(num_epochs):
         all_preds.extend(preds.cpu().numpy())
         all_labels.extend(labels.cpu().numpy())
 
-    # Calculate metrics for the epoch
+    # Calculation per epoch
     accuracy = 100 * np.sum(np.array(all_preds) == np.array(all_labels)) / len(all_labels)
     precision = precision_score(all_labels, all_preds, average='weighted', zero_division=0)
     recall = recall_score(all_labels, all_preds, average='weighted', zero_division=0)
@@ -185,7 +166,7 @@ with torch.no_grad():
         all_preds.extend(predicted.cpu().numpy())
         all_labels.extend(labels.cpu().numpy())
 
-# Calculate metrics for the test set
+# Calculation for test
 accuracy = 100 * correct / total
 precision = precision_score(all_labels, all_preds, average='weighted', zero_division=0)
 recall = recall_score(all_labels, all_preds, average='weighted', zero_division=0)
@@ -197,7 +178,7 @@ torch.save(model.state_dict(), "sudoku_fully_connected_model.pth")
 
 import random
 
-# Example: Recognize and print numbers from a random test image
+# Recognize and print numbers from a random test image
 if len(image_files) > 0:
     # Randomly choose an image from the test set
     random_index = random.randint(0, len(image_files) - 1)
@@ -210,18 +191,18 @@ if len(image_files) > 0:
 
     # Display the full image (entire Sudoku grid)
     image = cv2.imread(test_image_path)
-    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  # Convert BGR to RGB for correct display
+    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     plt.figure(figsize=(10, 10))
     plt.imshow(image_rgb)
     plt.title("Randomly Selected Sudoku Grid (Unseen by Model during Training)")
-    plt.axis('off')  # Hide axes
+    plt.axis('off')
     plt.show()
 
-    # Show the extracted cells arranged in a 9x9 grid
+    # Show the extracted cells 
     plt.figure(figsize=(10, 10))
     for i in range(9):
         for j in range(9):
-            plt.subplot(9, 9, i * 9 + j + 1)  # Place each cell in a 9x9 grid
+            plt.subplot(9, 9, i * 9 + j + 1) 
             plt.imshow(test_cells[i * 9 + j].squeeze().numpy(), cmap="gray")
             plt.axis("off")
     plt.suptitle("Extracted Cells from the Randomly Selected Image")
@@ -241,14 +222,14 @@ def solve_sudoku(board):
     """Solve the Sudoku using backtracking."""
     for row in range(9):
         for col in range(9):
-            if board[row][col] == 0:  # Empty cell
-                for num in range(1, 10):  # Try digits 1-9
+            if board[row][col] == 0: 
+                for num in range(1, 10): 
                     if is_valid(board, row, col, num):
                         board[row][col] = num
                         if solve_sudoku(board):
                             return True
-                        board[row][col] = 0  # Undo move
-                return False  # No valid number found
+                        board[row][col] = 0 
+                return False
     return True
 
 

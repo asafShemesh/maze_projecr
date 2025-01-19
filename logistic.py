@@ -10,18 +10,18 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import precision_score, recall_score
 
 
-# Define the logistic regression model
+#logistic regression model
 class LogisticRegressionModel(nn.Module):
     def __init__(self):
         super(LogisticRegressionModel, self).__init__()
-        self.linear = nn.Linear(28 * 28, 10)  # Logistic regression layer (input size: 28*28, output size: 10)
+        self.linear = nn.Linear(28 * 28, 10)  
 
     def forward(self, x):
-        x = x.view(-1, 28 * 28)  # Flatten the input
-        x = self.linear(x)  # Linear transformation
+        x = x.view(-1, 28 * 28)  
+        x = self.linear(x)
         return x
 
-# Function to preprocess and extract Sudoku cells
+#preprocess and extract Sudoku cells
 def preprocess_and_extract_cells(image_path):
     image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
     _, binary = cv2.threshold(image, 128, 255, cv2.THRESH_BINARY_INV)
@@ -31,18 +31,18 @@ def preprocess_and_extract_cells(image_path):
     x, y, w, h = cv2.boundingRect(largest_contour)
     grid = binary[y:y + h, x:x + w]
 
-    grid = cv2.resize(grid, (450, 450))  # Resize to standard size
+    grid = cv2.resize(grid, (450, 450))
     cells = []
-    cell_size = 50  # Each cell is 50x50 pixels
+    cell_size = 50 
     for i in range(9):
         for j in range(9):
             cell = grid[i * cell_size:(i + 1) * cell_size, j * cell_size:(j + 1) * cell_size]
-            cell = cv2.resize(cell, (28, 28))  # Resize to 28x28 for digit recognition
+            cell = cv2.resize(cell, (28, 28))
             cell = torch.tensor(cell, dtype=torch.float32).unsqueeze(0) / 255.0
             cells.append(cell)
     return cells
 
-# Function to load Sudoku labels from .dat files
+#load Sudoku labels from .dat files
 def load_sudoku_dat_files(dat_folder):
     dat_files = [f for f in os.listdir(dat_folder) if f.endswith('.dat')]
     sudoku_data = []
@@ -54,7 +54,7 @@ def load_sudoku_dat_files(dat_folder):
             sudoku_data.append(grid)
     return sudoku_data
 
-# Function to recognize and print numbers from cells
+#recognize and print numbers from cells
 def recognize_and_print_numbers(cells, model):
     grid = []
     for cell in cells:
@@ -67,7 +67,7 @@ def recognize_and_print_numbers(cells, model):
     for i in range(9):
         print(grid[i * 9:(i + 1) * 9])
 
-# Paths to the dataset
+
 sudoku_images_folder = "C:/Users/asaf0/OneDrive/maze_projecr/dataset"
 dat_folder = "C:/Users/asaf0/OneDrive/maze_projecr/labels"
 
@@ -104,7 +104,7 @@ criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(model.parameters(), lr=0.001)
 
 # Training loop with accuracy, precision, and recall
-num_epochs = 4
+num_epochs = 5
 for epoch in range(num_epochs):
     model.train()
     running_loss = 0.0
@@ -124,7 +124,7 @@ for epoch in range(num_epochs):
         all_preds.extend(preds.cpu().numpy())
         all_labels.extend(labels.cpu().numpy())
 
-    # Calculate metrics for the epoch
+    # Calculation per epoch
     accuracy = 100 * np.sum(np.array(all_preds) == np.array(all_labels)) / len(all_labels)
     precision = precision_score(all_labels, all_preds, average='weighted', zero_division=0)
     recall = recall_score(all_labels, all_preds, average='weighted', zero_division=0)
@@ -150,7 +150,7 @@ with torch.no_grad():
         all_preds.extend(predicted.cpu().numpy())
         all_labels.extend(labels.cpu().numpy())
 
-# Calculate metrics for the test set
+# Calculation for test
 accuracy = 100 * correct / total
 precision = precision_score(all_labels, all_preds, average='weighted', zero_division=0)
 recall = recall_score(all_labels, all_preds, average='weighted', zero_division=0)
@@ -184,11 +184,6 @@ if len(image_files) > 0:
             plt.axis("off")
     plt.suptitle("Extracted Cells from the First Image")
     plt.show()
-
-
-
-
-
 
 def is_valid(board, row, col, num):
     """Check if placing num at board[row][col] is valid."""
@@ -265,7 +260,7 @@ for row in recognized_grid:
     print(row)
 
 # Solve the Sudoku
-solved_grid = [row[:] for row in recognized_grid]  # Make a copy of the recognized grid
+solved_grid = [row[:] for row in recognized_grid]
 if solve_sudoku(solved_grid):
     print("Solved Sudoku Grid:")
     for row in solved_grid:
