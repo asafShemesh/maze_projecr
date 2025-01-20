@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Sudoku Deep Learning
 
 This repository contains a deep learning project focused on recognizing, solving, and displaying Sudoku puzzles using computer vision and neural networks. The solution employs convolutional layers, fully connected layers, and additional regularization techniques like dropout to achieve robust results.
