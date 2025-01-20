@@ -13,11 +13,11 @@ This repository contains a deep learning project focused on recognizing, solving
 .
 ├── dataset/          # Folder containing Sudoku grid images
 ├── labels/           # Folder containing corresponding Sudoku solution labels (.dat files)
-├── sudoku_deepLearning.py  # Main Python script for training and testing
-├── requirements.txt  # Dependencies required for the project
-├── README.md         # Project documentation
-└── sudoku_logistic_model.pth  # Trained model (saved weights)
-```
+├── baseline.py
+├── logistic.py
+├── fully_conected.py
+├── cnn.py  # Main Python script for training and testing
+├── README.md         # Project documentation``
 
 ## Installation
 ### Prerequisites
