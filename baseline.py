@@ -1,10 +1,9 @@
-import torch
-import torch.nn as nn
+import os
+import random
 import cv2
 import numpy as np
-import os
 import matplotlib.pyplot as plt
-import random
+from sklearn.metrics import precision_score, recall_score
 
 def preprocess_and_extract_cells(image_path):
     """Preprocess the Sudoku image, extract the grid, and split it into cells."""
@@ -18,12 +17,11 @@ def preprocess_and_extract_cells(image_path):
 
     grid = cv2.resize(grid, (450, 450))
     cells = []
-    cell_size = 50 
+    cell_size = 50
     for i in range(9):
         for j in range(9):
             cell = grid[i * cell_size:(i + 1) * cell_size, j * cell_size:(j + 1) * cell_size]
             cell = cv2.resize(cell, (28, 28))
-            cell = torch.tensor(cell, dtype=torch.float32).unsqueeze(0) / 255.0
             cells.append(cell)
 
     return cells
@@ -32,15 +30,17 @@ def recognize_and_print_numbers_random(cells):
     """Generate random numbers for Sudoku cells and print the grid."""
     grid = []
     for _ in cells:
-        random_digit = random.randint(0, 9)  # Generate random digit between 0 and 9
+        random_digit = random.randint(1, 9) 
         grid.append(random_digit)
 
     # Print the 9x9 grid
     for i in range(9):
         print(grid[i * 9:(i + 1) * 9])
 
+    return grid
+
 # Paths
-sudoku_images_folder = "C:/Users/asaf0/OneDrive/sudoku_deepLearning/dataset" 
+sudoku_images_folder = "C:/Users/asaf0/OneDrive/sudoku_deepLearning/dataset"
 
 # Extract the cells from the first image for demonstration purposes
 image_files = [
@@ -54,7 +54,7 @@ if len(image_files) > 0:
     test_cells = preprocess_and_extract_cells(test_image_path)  # Extract cells from the test image
 
     # Generate and print random numbers for the cells
-    recognize_and_print_numbers_random(test_cells)
+    random_predictions = recognize_and_print_numbers_random(test_cells)
 
     # Display the full image
     image = cv2.imread(test_image_path)
@@ -70,10 +70,18 @@ if len(image_files) > 0:
     for i in range(9):
         for j in range(9):
             plt.subplot(9, 9, i * 9 + j + 1)
-            plt.imshow(test_cells[i * 9 + j].squeeze().numpy(), cmap="gray")
+            plt.imshow(test_cells[i * 9 + j], cmap="gray")
             plt.axis("off")
     plt.suptitle("Extracted Cells from the First Image")
     plt.show()
+
+    true_labels = [random.randint(1, 9) for _ in range(81)]
+
+    # Calculate and display precision and recall
+    precision = precision_score(true_labels, random_predictions, average='weighted', zero_division=0)
+    recall = recall_score(true_labels, random_predictions, average='weighted', zero_division=0)
+    print(f"Precision of random predictions: {precision:.2f}")
+    print(f"Recall of random predictions: {recall:.2f}")
 
     # Calculate and display accuracy
     true_labels = [random.randint(0, 9) for _ in range(81)]

@@ -169,7 +169,7 @@ optimizer = optim.AdamW(model.parameters(), lr=0.001, weight_decay=1e-4)
 scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.1)
 
 # Training loop with accuracy, precision, and recall
-num_epochs = 5
+num_epochs = 30
 for epoch in range(num_epochs):
     model.train()
     running_loss = 0.0
